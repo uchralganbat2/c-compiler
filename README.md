@@ -1,2 +1,2 @@
 # c-compiler
-building c-compiler side project
+building a minimal c-compiler side project.
