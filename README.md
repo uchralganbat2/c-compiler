@@ -44,7 +44,7 @@ A minimal, functional C compiler written in **Go**. Compiles a subset of C sourc
 
 Build and test **one phase at a time**; each phase consumes the previous phase’s output. Recommended order:
 
-### Phase 1: Lexer (Tokenizer)
+### Phase 1: Lexer (Tokenizer) — done
 
 **Goal:** Turn raw source text into a stream of tokens.
 
@@ -95,6 +95,25 @@ Build and test **one phase at a time**; each phase consumes the previous phase�
 - **Implement:** Main entrypoint: read `.c` file → lex → parse → semantic check → codegen → write `.s` → invoke assembler → invoke linker (or `gcc -o out out.s`). Pass through exit codes and errors.
 - **Test:** Integration tests: compile and run a few minimal C programs (e.g. `return 42`, simple arithmetic, one `if` and one `while`).
 - **Deliverable:** CLI that compiles a C file to an executable (e.g. `go run ./cmd/compiler main.c -o main`).
+
+---
+
+### Phase 1 status
+
+Implemented in `internal/lexer`:
+
+- `NewLexer([]byte)` with `NextToken()` for streaming, or `Tokens()` for the whole `[]Token` (always ending in `EOF`).
+- Keywords via a lookup map (`LookupIdent`); identifiers allow `[A-Za-z_][A-Za-z0-9_]*`.
+- Two-char operators (`==`, `!=`, `<=`, `>=`) take precedence over their single-char prefixes.
+- Skips whitespace, `//` line comments and `/* */` block comments.
+- 1-based line/column on every token; `TokenType.String()` and `Token.String()` for readable errors.
+- Errors are returned as `ILLEGAL` tokens and lexing continues: unknown characters, a bare `!`, a number running into letters (`42abc`), and unterminated block comments.
+
+Run the tests:
+
+```
+go test ./...
+```
 
 ---
 
